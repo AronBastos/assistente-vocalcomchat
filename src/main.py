@@ -6,8 +6,8 @@ Assistente VocalCom - Ferramenta para Otimizar Atendimento via Chat
 import os
 import sys
 
-# Adiciona o diretório src ao path do Python
-sys.path.append(os.path.join(os.path.dirname(__file__)))
+# Adiciona o diretório pai ao path do Python para permitir importação de 'core'
+sys.path.append(os.path.dirname(__file__))
 
 def main():
     """Função principal que inicia o assistente"""

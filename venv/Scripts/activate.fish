@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV 'C:\WorkSpace\Projetos\assistente_vocalcom\venv'
+set -gx VIRTUAL_ENV 'C:\projetos\assistente-vocalcomchat\venv'
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"Scripts $PATH
