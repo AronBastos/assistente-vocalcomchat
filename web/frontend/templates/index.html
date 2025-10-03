@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente VocalCom Web</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <div class="logo-text">
+                        <h1>Assistente VocalCom</h1>
+                        <span class="version">v1.0.0</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="status-indicator" id="statusIndicator">
+                        <i class="fas fa-circle"></i>
+                        <span id="statusText">Conectado</span>
+                    </div>
+                    <button class="btn btn-icon" id="refreshBtn" title="Atualizar">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar respostas por palavra-chave, categoria ou código...">
+                        <button class="btn-clear" id="clearSearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="search-info">
+                        <span id="resultsCount">Carregando...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Responses Panel -->
+                <section class="panel responses-panel">
+                    <div class="panel-header">
+                        <h2>
+                            <i class="fas fa-comments"></i>
+                            Respostas Rápidas
+                        </h2>
+                        <button class="btn btn-primary btn-sm" id="addResponseBtn">
+                            <i class="fas fa-plus"></i>
+                            Nova
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="categories-container" id="categoriesContainer">
+                            <div class="loading-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Carregando respostas...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Preview Panel -->
+                <section class="panel preview-panel">
+                    <div class="panel-header">
+                        <h2>
+                            <i class="fas fa-eye"></i>
+                            Visualização
+                        </h2>
+                    </div>
+                    <div class="panel-content">
+                        <!-- Placeholder State -->
+                        <div class="preview-placeholder" id="previewPlaceholder">
+                            <div class="placeholder-icon">
+                                <i class="fas fa-mouse-pointer"></i>
+                            </div>
+                            <h3>Selecione uma resposta</h3>
+                            <p>Clique em uma resposta à esquerda para visualizar e copiar</p>
+                        </div>
+
+                        <!-- Active Preview -->
+                        <div class="preview-active" id="previewActive" style="display: none;">
+                            <div class="preview-header">
+                                <div class="preview-title">
+                                    <h3 id="previewTitle">Título da Resposta</h3>
+                                    <span class="category-tag" id="previewCategory">categoria</span>
+                                </div>
+                            </div>
+                            <div class="preview-content">
+                                <div class="response-text" id="previewText">
+                                    Conteúdo da resposta aparecerá aqui...
+                                </div>
+                            </div>
+                            <div class="preview-actions">
+                                <button class="btn btn-primary btn-block" id="copyBtn">
+                                    <i class="fas fa-copy"></i>
+                                    Copiar Resposta
+                                </button>
+                                <button class="btn btn-secondary btn-block" id="useTemplateBtn" style="display: none;">
+                                    <i class="fas fa-magic"></i>
+                                    Usar como Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Templates Section -->
+                    <div class="templates-section">
+                        <div class="section-header">
+                            <h3>
+                                <i class="fas fa-layer-group"></i>
+                                Templates Dinâmicos
+                            </h3>
+                        </div>
+                        <div class="templates-container" id="templatesContainer">
+                            <div class="loading-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Carregando templates...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <span id="responseCount">0 respostas carregadas</span>
+                    <span class="separator">•</span>
+                    <span id="lastUpdate">Última atualização: --:--:--</span>
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-text" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Response Modal -->
+    <div class="modal" id="addResponseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Nova Resposta</h3>
+                <button class="btn-close" id="closeAddModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addResponseForm">
+                    <div class="form-group">
+                        <label for="responseKey">Código Único *</label>
+                        <input type="text" id="responseKey" placeholder="Ex: problema_email, acesso_sistema" required>
+                        <small>Use letras minúsculas e underscores</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="responseCategory">Categoria *</label>
+                        <input type="text" id="responseCategory" placeholder="Ex: email, rede, acesso" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="responseMessage">Mensagem *</label>
+                        <textarea id="responseMessage" placeholder="Digite a mensagem completa da resposta..." rows="4" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAddBtn">Cancelar</button>
+                <button class="btn btn-primary" id="saveResponseBtn">Salvar Resposta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div class="modal" id="templateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="templateModalTitle">Preencher Template</h3>
+                <button class="btn-close" id="closeTemplateModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="templateModalContent">
+                    <!-- Conteúdo dinâmico do template -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelTemplateBtn">Cancelar</button>
+                <button class="btn btn-primary" id="generateTemplateBtn">Gerar e Copiar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle" id="notificationIcon"></i>
+            <span id="notificationText">Operação realizada com sucesso!</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
